@@ -1,0 +1,170 @@
+int red1 = 13;//introdução de variáveis 
+int red2 = 12;
+int red3 = 11;
+int red4 = 10;
+int green1 = 9;
+int green2 = 8;
+int green3 = 7;
+int green4 = 6;
+int redrgb = 5;
+int bluergb = 4;
+int greenrgb = 3;
+int botao = 2;
+int res;
+bool flag = true;//flag booleana para imprimir mensagem inicial uma vez
+int buttonState; 
+int lastButtonState = LOW;
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 50;  
+
+void setup(){
+  Serial.begin(9600);
+  pinMode(red1,OUTPUT);
+  pinMode(red2,OUTPUT);
+  pinMode(red3,OUTPUT);
+  pinMode(red4,OUTPUT);
+  pinMode(green1,OUTPUT);
+  pinMode(green2,OUTPUT);
+  pinMode(green3,OUTPUT);
+  pinMode(green4,OUTPUT);
+  pinMode(redrgb,OUTPUT);
+  pinMode(bluergb,OUTPUT);
+  pinMode(greenrgb,OUTPUT);
+  pinMode(botao,INPUT_PULLUP);
+}
+
+void loop(){
+  int d = 0;
+  int i = 0;
+  int cont=0;
+  int n1 = random(0,17);
+  int n2 = random(0,17);
+  int o = random(1,4);
+  if (flag==true){
+    Serial.println("###Welcome to the Bit Math Game!###");
+    Serial.println("Press button to start!");
+	flag=false;
+  }
+if (d == 0){ //debounce
+    int reading = digitalRead(botao);
+    if (reading != lastButtonState){
+       lastDebounceTime = millis();
+    }
+    if ((millis() - lastDebounceTime) < debounceDelay){
+       if (reading != buttonState){
+          buttonState = reading;
+         if (buttonState != HIGH){
+          d=1;
+          
+
+        }
+       }
+    }
+}
+ if (d == 1){ //Apenas começa se premirmos o botão
+    if (n1&0b0000001){//associar os numeros binarios aos leds
+      digitalWrite(red1,HIGH);
+    }
+     if (n1&0b0000010){
+      digitalWrite(red2,HIGH);
+    }
+     if (n1&0b0000100){
+      digitalWrite(red3,HIGH);
+    }
+     if (n1&0b0001000){
+      digitalWrite(red4,HIGH);
+     }
+    if (n2&0b0000001){
+      digitalWrite(green1,HIGH);
+    }
+     if (n2&0b0000010){
+      digitalWrite(green2,HIGH);
+    }
+     if (n2&0b0000100){
+      digitalWrite(green3,HIGH);
+    }
+     if (n2&0b0001000){
+      digitalWrite(green4,HIGH);
+    }
+    if(o==1){//operações binarias
+       res=(n1&n2);
+       digitalWrite(redrgb,HIGH);
+    }
+    if(o==2){
+      res=(n1|n2);
+      digitalWrite(bluergb,HIGH);
+    }
+    if(o==3){
+      res=(n1^n2);
+      digitalWrite(greenrgb,HIGH);
+    }
+    int cron1 = millis();//cronometro
+    int cron2 = millis();
+    while ((cron2-cron1) < 7000){
+       cron2 = millis();
+      int reading = digitalRead(botao);//debounce outa vez
+      if (reading != lastButtonState){
+       lastDebounceTime = millis();
+      }
+      if ((millis() - lastDebounceTime) < debounceDelay){
+       if (reading != buttonState){
+          buttonState = reading;
+         if (buttonState != HIGH){
+          cont++;//contador
+          Serial.println(cont);
+          d=2;
+         }
+       }
+      }
+      if ((millis() - lastDebounceTime)== 3500){
+            Serial.println("Passou metade do seu tempo");
+      }
+      if ((millis() - lastDebounceTime)== 5250){
+            Serial.println("Passou 75% do seu tempo");
+      }
+      if ((millis() - lastDebounceTime)> 1000){//reset caso o botão seja pressionado por mais de um segundo
+         Serial.println("Reset");
+         Serial.println("###Welcome to the Bit Math Game!###");
+         Serial.println("Press button to start!");
+         if (buttonState != HIGH){
+           d = 2;
+         }
+      }
+    }
+      if (cont==res && d!= 2){//caso ganhe
+            Serial.println("Ganhou,parabéns!!!");
+           for ( int c = 0; c < 4 ; c++){ 
+            for (int i=0; i<=4; i++){
+              digitalWrite(6+i, 1);
+              digitalWrite(13-i, 0);
+              delay(200);
+            }
+            for (int i=0; i<=4; i++){
+              digitalWrite(9-i, 1);
+              digitalWrite(10+i, 0);
+              delay(200);
+            }
+           }
+          }
+      if (cont!=res && d != 2){//caso perca 
+              Serial.println("Infelizmente perdeu.");
+              for (int i=0; i<=5; i++){
+                digitalWrite(redrgb, HIGH);
+                delay(500);
+                digitalWrite(redrgb, LOW);
+                delay(500);
+              }
+          }    
+ }
+        cont = 0;
+        n1=random(0,17);
+        n2=random(0,17);
+        o=random(1,4);
+      
+    }
+    
+ 
+
+
+
+
